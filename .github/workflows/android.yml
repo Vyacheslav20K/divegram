@@ -1,0 +1,52 @@
+name: DiveGram Android CI
+
+on:
+  push:
+    branches: [ "master", "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install SDK 36, NDK 27 and CMake
+        run: |
+          yes | sdkmanager --licenses > /dev/null
+          sdkmanager --install "platforms;android-36" "build-tools;36.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build DiveGram APK
+        env:
+          TELEGRAM_APP_ID: "38561070"
+          TELEGRAM_APP_HASH: "3b9eb5a47582ea2cd2c4e15588ab41e3"
+          ORG_GRADLE_PROJECT_TELEGRAM_APP_ID: "38561070"
+          ORG_GRADLE_PROJECT_TELEGRAM_APP_HASH: "3b9eb5a47582ea2cd2c4e15588ab41e3"
+        run: ./gradlew assembleAfatDebug --stacktrace
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DiveGram-APK
+          if-no-files-found: ignore
+          path: |
+            **/*.apk
+            !**/intermediates/**
+            !**/tmp/**
+
