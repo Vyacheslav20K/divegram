@@ -81,11 +81,9 @@ dependencies {
     implementation 'com.google.android.gms:play-services-mlkit-subject-segmentation:16.0.0-beta1'
     implementation 'com.google.android.gms:play-services-mlkit-image-labeling:16.0.8'
 
-    // Pinned: firebase-pnv alone would pull credentials 1.5.0 (passkeys were built on 1.6.0-alpha04).
     implementation "androidx.credentials:credentials:1.6.0-alpha04"
     implementation "androidx.credentials:credentials-play-services-auth:1.6.0-alpha04"
 
-    // 34.19.0 is the last BoM for minSdk 23: BoM 35.x requires minSdk 24 (33.16.0 was the last for Android 5).
     api platform('com.google.firebase:firebase-bom:34.19.0')
     implementation 'com.google.firebase:firebase-messaging'
     implementation "com.google.firebase:firebase-pnv"
@@ -107,18 +105,18 @@ dependencies {
     api project(":TMessagesProj_Modules:media3:media-lib-session")
     api project(':jlatexmath')
 
-//    implementation 'com.google.mlkit:translate:17.0.3'
-
     implementation 'com.google.android.recaptcha:recaptcha:18.7.1'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
 }
 
+def diveAppId = (project.findProperty("TELEGRAM_APP_ID") ?: System.getenv("TELEGRAM_APP_ID") ?: "38561070").toString()
+def diveAppHash = (project.findProperty("TELEGRAM_APP_HASH") ?: System.getenv("TELEGRAM_APP_HASH") ?: "3b9eb5a47582ea2cd2c4e15588ab41e3").toString()
+
 android {
     compileSdkVersion 36
     buildToolsVersion '36.0.0'
     ndkVersion "27.2.12479018"
-
 
     externalNativeBuild {
         cmake {
@@ -126,9 +124,9 @@ android {
         }
     }
 
-    // IWidgetEngine: the widget engine's isolated process (WidgetEngineService).
     buildFeatures {
         aidl true
+        buildConfig true
     }
 
     lintOptions {
@@ -152,10 +150,14 @@ android {
 
         multiDexEnabled true
 
+        buildConfigField "int", "APP_ID", diveAppId
+        buildConfigField "String", "APP_HASH", "\"${diveAppHash}\""
+        buildConfigField "String", "DIVEGRAM_PACKAGE", "\"org.divegram.gvs\""
+
         externalNativeBuild {
             cmake {
                 version '3.22.1'
-                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-23' //, '-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON'
+                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-23'
                 targets 'tmessages.49', 'twidget'
             }
         }
@@ -244,7 +246,6 @@ android {
     namespace 'org.telegram.messenger'
 }
 
-
 def getProps(String propName) {
     def propsFile = rootProject.file('local.properties')
     if (propsFile.exists()) {
@@ -252,9 +253,10 @@ def getProps(String propName) {
         props.load(new FileInputStream(propsFile))
         return props[propName]
     } else {
-        return "";
+        return ""
     }
 }
+
 apply plugin: 'com.google.gms.google-services'
 
 task checkVisibility {
