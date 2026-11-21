@@ -21,19 +21,18 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Install SDK 36, NDK 27 and CMake
         run: |
-          yes | sdkmanager --licenses > /dev/null
-          sdkmanager --install "platforms;android-36" "build-tools;36.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --install "platforms;android-36" "build-tools;36.0.0" "ndk;27.2.12479018" "cmake;3.22.1"
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Build DiveGram APK
         env:
+          DIVEGRAM_APPLICATION_ID: "org.divegram.gvs"
+          ORG_GRADLE_PROJECT_DIVEGRAM_APPLICATION_ID: "org.divegram.gvs"
           TELEGRAM_APP_ID: "38561070"
           TELEGRAM_APP_HASH: "3b9eb5a47582ea2cd2c4e15588ab41e3"
           ORG_GRADLE_PROJECT_TELEGRAM_APP_ID: "38561070"
@@ -49,4 +48,3 @@ jobs:
             **/*.apk
             !**/intermediates/**
             !**/tmp/**
-
