@@ -46,7 +46,7 @@ public class DiveGramThemeApplier {
             Theme.setColor(Theme.key_chat_messageTextOut, Color.parseColor("#FFFFFF"), false);
             Theme.setColor(Theme.key_chat_messageTextIn, Color.parseColor("#EDE7F6"), false);
 
-            Theme.saveThemeColors();
+            
         } catch (Throwable ignored) {
             // Безопасный fallback, если в конкретной ревизии Telegram сигнатура метода отличается
         }
