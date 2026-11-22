@@ -21,11 +21,13 @@ dependencies {
     implementation files('../TMessagesProj/libs/libgsaverification-client.aar')
 }
 
+def diveApplicationId = (project.findProperty("DIVEGRAM_APPLICATION_ID") ?: System.getenv("DIVEGRAM_APPLICATION_ID") ?: "org.divegram.gvs").toString()
+
 android {
     compileSdkVersion 36
     buildToolsVersion '36.0.0'
 
-    defaultConfig.applicationId = APP_PACKAGE
+    defaultConfig.applicationId = diveApplicationId
 
 
     lintOptions {
@@ -73,7 +75,7 @@ android {
             debuggable true
             jniDebuggable true
             signingConfig signingConfigs.debug
-            applicationIdSuffix ".beta"
+            resValue "string", "AppName", "DiveGram"
             minifyEnabled false
             shrinkResources false
             multiDexEnabled true
@@ -97,6 +99,7 @@ android {
             debuggable false
             jniDebuggable false
             signingConfig signingConfigs.release
+            resValue "string", "AppName", "DiveGram"
             minifyEnabled true
             shrinkResources true
             multiDexEnabled true
@@ -153,7 +156,7 @@ android {
 
     applicationVariants.all { variant ->
         variant.outputs.all { output ->
-            outputFileName = "app.apk"
+            outputFileName = "DiveGram-${variant.name}.apk"
             output.versionCodeOverride = defaultConfig.versionCode * 10 + variant.productFlavors.get(0).abiVersionCode
         }
     }
